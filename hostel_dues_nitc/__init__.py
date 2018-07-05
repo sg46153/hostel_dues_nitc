@@ -1,0 +1,1 @@
+from .hostel_dues import main as init 

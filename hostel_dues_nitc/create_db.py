@@ -1,4 +1,10 @@
-import requests,PyPDF2,sys,os,re, shelve
+import requests
+import PyPDF2
+import sys
+import os
+import re
+import shelve
+
 
 def get_regex(course):
 	if course == 'BTECH.pdf':
@@ -8,13 +14,14 @@ def get_regex(course):
 	else:
 		return re.compile(r'M\d+\w{2}\s.+\s-?\d+')
 
+
 def main():
 	URL = 'http://www.nitc.ac.in/app/webroot/img/upload/'
-	COURSE = ['BTECH.pdf','PG.pdf','PhD.pdf']
+	COURSE = ['BTECH.pdf', 'PG.pdf', 'PhD.pdf']
 	dues_list = shelve.open('dues')
 	for course in COURSE:
 		res = requests.get(URL+course)
-		dues = open(course,'wb')
+		dues = open(course, 'wb')
 		for chunk in res.iter_content(100000):
 			dues.write(chunk)
 		dues.close()
@@ -22,7 +29,6 @@ def main():
 		pdf_file_obj = open(course, 'rb')
 		pdf_reader = PyPDF2.PdfFileReader(pdf_file_obj)
 		total_pages = pdf_reader.numPages
-
 
 		roll_rex = get_regex(course)
 		for i in range(total_pages):
@@ -32,9 +38,9 @@ def main():
 
 			for res in search_res:
 				r = res.split('\n')
-				dues_list[r[0]] = [r[1],r[2]]
+				dues_list[r[0]] = [r[1], r[2]]
 	dues_list.close()
-	os.system('rm *.pdf')
+
 
 if __name__ == "__main__":
 	main()
